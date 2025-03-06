@@ -1,36 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Grid, Typography, Paper } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { getTradeCount } from '../services/api';
+import React, { useState } from 'react';
+import { Button, Grid, Typography } from '@mui/material';
+import AddTradeForm from './AddTradeForm';
 
 const Dashboard = () => {
-  const [tradeCount, setTradeCount] = useState(0);
+  const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    const fetchTradeCount = async () => {
-      try {
-        const count = await getTradeCount();
-        setTradeCount(count);
-      } catch (error) {
-        console.error('Fehler beim Abrufen der Trade-Anzahl:', error);
-      }
-    };
-    fetchTradeCount();
-  }, []);
+  const toggleForm = () => {
+    setShowForm(!showForm);
+  };
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography variant="h4">Willkommen im Trading Journal</Typography>
       </Grid>
-      <Grid item xs={6}>
-        <Paper elevation={3} style={{ padding: '1rem' }}>
-          <Typography variant="h6">Trades:</Typography>
-          <Typography variant="body1">{tradeCount}</Typography>
-          <Link to="/trades">Zu den Trades</Link>
-        </Paper>
+      <Grid item xs={12}>
+        <Button variant="contained" color="primary" onClick={toggleForm}>
+          {showForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
+        </Button>
       </Grid>
-      {/* ... Rest der Komponente */}
+      {showForm && (
+        <Grid item xs={12}>
+          <AddTradeForm />
+        </Grid>
+      )}
+      {/* Hier können weitere Dashboard-Elemente hinzugefügt werden */}
     </Grid>
   );
 };

@@ -1,93 +1,115 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Typography } from '@mui/material';
-import { getTrades, deleteTrade, logout } from '../services/api';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent } from '@mui/material';
+import AddTradeForm from './AddTradeForm';
+import EditTradeForm from './EditTradeForm';
+import { getTrades } from '../services/api';
 
 const TradeList = () => {
-  const navigate = useNavigate();
-  const { setIsAuthenticated } = useAuth();
   const [trades, setTrades] = useState([]);
-
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingTrade, setEditingTrade] = useState(null);
 
   useEffect(() => {
-    const fetchTrades = async () => {
-      try {
-        const response = await getTrades(); // Implementiere diese Funktion in api.js
-        setTrades(response.data);
-      } catch (error) {
-        console.error('Fehler beim Laden der Trades:', error);
-      }
-    };
     fetchTrades();
   }, []);
-  
 
   const fetchTrades = async () => {
     try {
       const response = await getTrades();
       setTrades(response.data);
     } catch (error) {
-      console.error('Error fetching trades:', error);
+      console.error('Fehler beim Abrufen der Trades:', error);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteTrade(id);
-      fetchTrades();
-    } catch (error) {
-      console.error('Error deleting trade:', error);
-    }
+  const toggleAddForm = () => {
+    setShowAddForm(!showAddForm);
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsAuthenticated(false);
-    navigate('/login');
+  const handleRowClick = (trade) => {
+    setEditingTrade(trade);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditingTrade(null);
+  };
+
+  const handleTradeUpdated = () => {
+    fetchTrades();
+    setEditingTrade(null);
   };
 
   return (
-    <Box sx={{ width: '100%', mb: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Trade List
-        </Typography>
-        <Button onClick={handleLogout} variant="contained" color="secondary">
-          Logout
-        </Button>
-      </Box>
+    <div>
+      <Typography variant="h4" gutterBottom>
+        Trade Liste
+      </Typography>
+      <Button variant="contained" color="primary" onClick={toggleAddForm} style={{ marginBottom: '20px' }}>
+        {showAddForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
+      </Button>
+      {showAddForm && <AddTradeForm onTradeAdded={fetchTrades} />}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Trade Number</TableCell>
-              <TableCell>Date</TableCell>
+              <TableCell>Trade Nr.</TableCell>
+              <TableCell>Datum</TableCell>
               <TableCell>Symbol</TableCell>
+              <TableCell>Model</TableCell>
+              <TableCell>Bias</TableCell>
+              <TableCell>Session</TableCell>
+              <TableCell>Timeframe</TableCell>
+              <TableCell>Confluences</TableCell>
+              <TableCell>Order Typ</TableCell>
               <TableCell>Position</TableCell>
-              <TableCell>Profit/Loss</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>SL Pips</TableCell>
+              <TableCell>Risk %</TableCell>
+              <TableCell>Net PnL</TableCell>
+              <TableCell>Max R/R</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {trades.map((trade) => (
-              <TableRow key={trade._id}>
-                <TableCell>{trade.tradeNumber}</TableCell>
-                <TableCell>{new Date(trade.date).toLocaleDateString()}</TableCell>
-                <TableCell>{trade.symbol}</TableCell>
-                <TableCell>{trade.position}</TableCell>
-                <TableCell>{trade.profitLoss}</TableCell>
-                <TableCell>
-                  <Button onClick={() => handleDelete(trade._id)} color="error" variant="outlined">
-                    Delete
-                  </Button>
-                </TableCell>
+              <TableRow 
+                key={trade._id} 
+                onClick={() => handleRowClick(trade)}
+                style={{ cursor: 'pointer' }}
+                hover
+              >
+                <TableCell>{trade.tradeNumber || ''}</TableCell>
+                <TableCell>{trade.date ? new Date(trade.date).toLocaleDateString() : ''}</TableCell>
+                <TableCell>{trade.symbol || ''}</TableCell>
+                <TableCell>{trade.model || ''}</TableCell>
+                <TableCell>{trade.bias || ''}</TableCell>
+                <TableCell>{trade.session || ''}</TableCell>
+                <TableCell>{trade.timeframe || ''}</TableCell>
+                <TableCell>{trade.confluences ? trade.confluences.join(', ') : ''}</TableCell>
+                <TableCell>{trade.orderType || ''}</TableCell>
+                <TableCell>{trade.position || ''}</TableCell>
+                <TableCell>{trade.status || ''}</TableCell>
+                <TableCell>{trade.slPips !== undefined ? trade.slPips : ''}</TableCell>
+                <TableCell>{trade.riskPercentage !== undefined ? `${trade.riskPercentage}%` : ''}</TableCell>
+                <TableCell>{trade.netPnL !== undefined ? trade.netPnL : ''}</TableCell>
+                <TableCell>{trade.maxRR !== undefined ? trade.maxRR : ''}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+
+      <Dialog open={editingTrade !== null} onClose={handleCloseEditDialog} maxWidth="md" fullWidth>
+        <DialogContent>
+          {editingTrade && (
+            <EditTradeForm
+              trade={editingTrade}
+              onTradeUpdated={handleTradeUpdated}
+              onCancel={handleCloseEditDialog}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 
