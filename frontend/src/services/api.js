@@ -35,7 +35,7 @@ export const getTradeCount = async () => {
     console.error('Fehler beim Abrufen der Trade-Anzahl:', error);
   }
 };
-export const updateTrade = (id, tradeData) => api.put(`/trades/${id}`, tradeData);
+
 
 
 export default api;

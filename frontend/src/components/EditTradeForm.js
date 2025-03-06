@@ -18,13 +18,14 @@ const EditTradeForm = ({ trade, onTradeUpdated, onCancel }) => {
     e.preventDefault();
     try {
       await updateTrade(trade._id, formData);
-      alert('Trade erfolgreich aktualisiert!');
+      // Rufe onTradeUpdated auf, um die Tradelist zu aktualisieren und das Fenster zu schließen
       onTradeUpdated();
     } catch (error) {
       console.error('Fehler beim Aktualisieren des Trades:', error);
       alert('Fehler beim Aktualisieren des Trades.');
     }
   };
+  
 
   return (
     <Container maxWidth="sm">

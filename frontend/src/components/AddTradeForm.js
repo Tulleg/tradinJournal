@@ -30,26 +30,11 @@ const AddTradeForm = ({ onTradeAdded }) => {
     try {
       await createTrade({
         ...formData,
-        confluences: formData.confluences.split(',').map((item) => item.trim()), // String in Array umwandeln
+        confluences: formData.confluences.split(',').map((item) => item.trim()),
       });
-      alert('Trade erfolgreich hinzugefügt!');
-      setFormData({
-        symbol: '',
-        model: '',
-        bias: '',
-        session: '',
-        timeframe: '',
-        confluences: '',
-        orderType: '',
-        position: '',
-        status: '',
-        date: '',
-        slPips: 0,
-        riskPercentage: 0,
-        netPnL: 0,
-        maxRR: 0,
-      });
-      if (onTradeAdded) onTradeAdded(); // Aktualisiert die Trade-Liste
+      
+      // Rufe onTradeAdded auf, um die Tradelist zu aktualisieren und das Fenster zu schließen
+      if (onTradeAdded) onTradeAdded();
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Trades:', error);
       alert('Fehler beim Hinzufügen des Trades.');

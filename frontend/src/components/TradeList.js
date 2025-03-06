@@ -39,6 +39,11 @@ const TradeList = () => {
     setEditingTrade(null);
   };
 
+  const handleTradeAdded = () => {
+    fetchTrades();
+    setShowAddForm(false);
+  };
+
   return (
     <div>
       <Typography variant="h4" gutterBottom>
@@ -47,7 +52,7 @@ const TradeList = () => {
       <Button variant="contained" color="primary" onClick={toggleAddForm} style={{ marginBottom: '20px' }}>
         {showAddForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
       </Button>
-      {showAddForm && <AddTradeForm onTradeAdded={fetchTrades} />}
+      {showAddForm && <AddTradeForm onTradeAdded={handleTradeAdded} />}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
