@@ -27,5 +27,13 @@ export const resetPasswordRequest = (email) => api.post('/auth/reset-password-re
 export const logout = () => {
   localStorage.removeItem('token');
 };
+export const getTradeCount = async () => {
+  try {
+    const response = await api.get('/trades/count');
+    return response.data.count;
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Trade-Anzahl:', error);
+  }
+};
 
 export default api;

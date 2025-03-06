@@ -2,14 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Typography } from '@mui/material';
 import { getTrades, deleteTrade, logout } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const TradeList = ({ setIsAuthenticated }) => {
-  const [trades, setTrades] = useState([]);
+const TradeList = () => {
   const navigate = useNavigate();
+  const { setIsAuthenticated } = useAuth();
+  const [trades, setTrades] = useState([]);
+
 
   useEffect(() => {
+    const fetchTrades = async () => {
+      try {
+        const response = await getTrades(); // Implementiere diese Funktion in api.js
+        setTrades(response.data);
+      } catch (error) {
+        console.error('Fehler beim Laden der Trades:', error);
+      }
+    };
     fetchTrades();
   }, []);
+  
 
   const fetchTrades = async () => {
     try {

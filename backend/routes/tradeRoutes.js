@@ -15,4 +15,7 @@ router.put('/:tradeId', auth, tradeController.updateTrade);
 // Route zum Löschen eines bestehenden Trades
 router.delete('/:tradeId', auth, tradeController.deleteTrade);
 
+//Anzahl Trades abrufen
+router.get('/count', auth, tradeController.getTradeCount);
+
 module.exports = router;

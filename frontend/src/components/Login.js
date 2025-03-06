@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, Link, Alert } from '@mui/material';
 import { login } from '../services/api';
 import { Link as RouterLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-const Login = ({ setIsAuthenticated }) => {
+
+
+
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e) => {
@@ -14,11 +21,15 @@ const Login = ({ setIsAuthenticated }) => {
       const response = await login({ email, password });
       localStorage.setItem('token', response.data.token);
       setIsAuthenticated(true);
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
-      setErrorMessage('Login fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten.');
+      setErrorMessage('Login fehlgeschlagen. Bitte überprüfen Sie Ihre Eingaben.');
+
     }
   };
+
+  
 
   return (
     <Container maxWidth="xs">

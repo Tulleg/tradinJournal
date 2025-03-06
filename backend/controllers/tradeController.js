@@ -60,3 +60,12 @@ exports.deleteTrade = async (req, res) => {
     res.status(400).json({ message: 'Fehler beim Löschen des Trades', error: error.message });
   }
 };
+// Funktion Anzahl der Trades
+exports.getTradeCount = async (req, res) => {
+  try {
+    const count = await Trade.countDocuments({ account: req.user.userId });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: 'Fehler beim Abrufen der Trade-Anzahl', error: error.message });
+  }
+};
