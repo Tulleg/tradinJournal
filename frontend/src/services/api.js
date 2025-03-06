@@ -24,5 +24,8 @@ export const updateTrade = (id, tradeData) => api.put(`/trades/${id}`, tradeData
 export const deleteTrade = (id) => api.delete(`/trades/${id}`);
 export const register = (userData) => api.post('/auth/register', userData);
 export const resetPasswordRequest = (email) => api.post('/auth/reset-password-request', email);
+export const logout = () => {
+  localStorage.removeItem('token');
+};
 
 export default api;

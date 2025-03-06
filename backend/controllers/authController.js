@@ -108,3 +108,11 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Fehler beim Zurücksetzen des Passworts', error: error.message });
   }
 };
+exports.logout = async (req, res) => {
+  try {
+    // Hier kannst du den Token ungültig machen, wenn du eine Blacklist verwendest
+    res.json({ message: 'Benutzer erfolgreich ausgeloggt' });
+  } catch (error) {
+    res.status(500).json({ message: 'Fehler beim Logout', error: error.message });
+  }
+};

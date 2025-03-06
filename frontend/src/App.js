@@ -14,7 +14,7 @@ function App() {
         <Route path="/login" element={isAuthenticated ? <Navigate to="/trades" /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/trades" element={isAuthenticated ? <TradeList /> : <Navigate to="/login" />} />
+        <Route path="/trades" element={isAuthenticated ? <TradeList setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
@@ -22,5 +22,3 @@ function App() {
 }
 
 export default App;
-
-
