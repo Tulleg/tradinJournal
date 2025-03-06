@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, MenuItem, Grid } from '@mui/material';
+import { TextField, Button, Typography, Container, Dialog, DialogContent, DialogTitle, MenuItem, Grid } from '@mui/material';
 import { createTrade } from '../services/api';
 
 const AddTradeForm = ({ onTradeAdded }) => {
@@ -19,6 +19,7 @@ const AddTradeForm = ({ onTradeAdded }) => {
     netPnL: 0,
     maxRR: 0,
   });
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent, Checkbox, IconButton } from '@mui/material';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Checkbox, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddTradeForm from './AddTradeForm';
 import EditTradeForm from './EditTradeForm';
@@ -10,6 +10,10 @@ const TradeList = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTrade, setEditingTrade] = useState(null);
   const [selectedTrades, setSelectedTrades] = useState([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [addFormOpen, setAddFormOpen] = useState(false);
+
+
 
   useEffect(() => {
     fetchTrades();
@@ -25,8 +29,9 @@ const TradeList = () => {
   };
 
   const toggleAddForm = () => {
-    setShowAddForm(!showAddForm);
+    setAddFormOpen(!addFormOpen);
   };
+  
 
   const handleRowClick = (trade) => {
     setEditingTrade(trade);
@@ -43,7 +48,12 @@ const TradeList = () => {
 
   const handleTradeAdded = () => {
     fetchTrades();
-    setShowAddForm(false);
+    setAddFormOpen(false);
+  };
+  
+
+  const handleDeleteSelected = () => {
+    setDeleteDialogOpen(true);
   };
 
   const handleCheckboxChange = (event, tradeId) => {
@@ -53,27 +63,35 @@ const TradeList = () => {
       setSelectedTrades(selectedTrades.filter(id => id !== tradeId));
     }
   };
+  
+  
 
-  const handleDeleteSelected = async () => {
-    if (window.confirm('Sind Sie sicher, dass Sie die ausgewählten Trades löschen möchten?')) {
-      try {
-        await Promise.all(selectedTrades.map(id => deleteTrade(id)));
-        fetchTrades();
-        setSelectedTrades([]);
-      } catch (error) {
-        console.error('Fehler beim Löschen der Trades:', error);
-      }
+  const confirmDelete = async () => {
+    try {
+      await Promise.all(selectedTrades.map(id => deleteTrade(id)));
+      fetchTrades();
+      setSelectedTrades([]);
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      console.error('Fehler beim Löschen der Trades:', error);
     }
   };
+  
 
   return (
     <div>
       <Typography variant="h4" gutterBottom>
         Trade Liste
       </Typography>
-      <Button variant="contained" color="primary" onClick={toggleAddForm} style={{ marginBottom: '20px', marginRight: '10px' }}>
-        {showAddForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
-      </Button>
+      <Button 
+  variant="contained" 
+  color="primary" 
+  onClick={toggleAddForm} 
+  style={{ marginBottom: '20px', marginRight: '10px' }}
+>
+  Neuen Trade hinzufügen
+</Button>
+
       {selectedTrades.length > 0 && (
         <Button
           variant="contained"
@@ -165,6 +183,47 @@ const TradeList = () => {
           )}
         </DialogContent>
       </Dialog>
+      <Dialog
+  open={deleteDialogOpen}
+  onClose={() => setDeleteDialogOpen(false)}
+  aria-labelledby="alert-dialog-title"
+  aria-describedby="alert-dialog-description"
+>
+  <DialogTitle id="alert-dialog-title">{"Trades löschen"}</DialogTitle>
+  <DialogContent>
+    <DialogContentText id="alert-dialog-description">
+      Sind Sie sicher, dass Sie die ausgewählten Trades löschen möchten?
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+      Abbrechen
+    </Button>
+    <Button onClick={confirmDelete} color="primary" autoFocus>
+      Löschen
+    </Button>
+  </DialogActions>
+</Dialog>
+<Dialog open={addFormOpen} onClose={toggleAddForm} maxWidth="md" fullWidth>
+  <DialogTitle>Neuen Trade hinzufügen</DialogTitle>
+  <DialogContent>
+    <AddTradeForm onTradeAdded={handleTradeAdded} />
+  </DialogContent>
+</Dialog>
+<Dialog open={addFormOpen} onClose={toggleAddForm} maxWidth="md" fullWidth>
+  <DialogTitle>Neuen Trade hinzufügen</DialogTitle>
+  <DialogContent>
+    <AddTradeForm onTradeAdded={handleTradeAdded} />
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={toggleAddForm} color="primary">
+      Abbrechen
+    </Button>
+  </DialogActions>
+</Dialog>
+
+
+
     </div>
   );
 };
