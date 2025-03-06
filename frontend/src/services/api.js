@@ -18,10 +18,11 @@ api.interceptors.request.use((config) => {
 });
 
 export const login = (credentials) => api.post('/auth/login', credentials);
-export const register = (userData) => api.post('/auth/register', userData);
 export const getTrades = () => api.get('/trades');
 export const createTrade = (tradeData) => api.post('/trades', tradeData);
 export const updateTrade = (id, tradeData) => api.put(`/trades/${id}`, tradeData);
 export const deleteTrade = (id) => api.delete(`/trades/${id}`);
+export const register = (userData) => api.post('/auth/register', userData);
+export const resetPasswordRequest = (email) => api.post('/auth/reset-password-request', email);
 
 export default api;
