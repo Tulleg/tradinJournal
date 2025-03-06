@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent } from '@mui/material';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent, Checkbox, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AddTradeForm from './AddTradeForm';
 import EditTradeForm from './EditTradeForm';
-import { getTrades } from '../services/api';
+import { getTrades, deleteTrade } from '../services/api';
 
 const TradeList = () => {
   const [trades, setTrades] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTrade, setEditingTrade] = useState(null);
+  const [selectedTrades, setSelectedTrades] = useState([]);
 
   useEffect(() => {
     fetchTrades();
@@ -44,19 +46,63 @@ const TradeList = () => {
     setShowAddForm(false);
   };
 
+  const handleCheckboxChange = (event, tradeId) => {
+    if (event.target.checked) {
+      setSelectedTrades([...selectedTrades, tradeId]);
+    } else {
+      setSelectedTrades(selectedTrades.filter(id => id !== tradeId));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (window.confirm('Sind Sie sicher, dass Sie die ausgewählten Trades löschen möchten?')) {
+      try {
+        await Promise.all(selectedTrades.map(id => deleteTrade(id)));
+        fetchTrades();
+        setSelectedTrades([]);
+      } catch (error) {
+        console.error('Fehler beim Löschen der Trades:', error);
+      }
+    }
+  };
+
   return (
     <div>
       <Typography variant="h4" gutterBottom>
         Trade Liste
       </Typography>
-      <Button variant="contained" color="primary" onClick={toggleAddForm} style={{ marginBottom: '20px' }}>
+      <Button variant="contained" color="primary" onClick={toggleAddForm} style={{ marginBottom: '20px', marginRight: '10px' }}>
         {showAddForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
       </Button>
+      {selectedTrades.length > 0 && (
+        <Button
+          variant="contained"
+          color="secondary"
+          startIcon={<DeleteIcon />}
+          onClick={handleDeleteSelected}
+          style={{ marginBottom: '20px' }}
+        >
+          Ausgewählte löschen ({selectedTrades.length})
+        </Button>
+      )}
       {showAddForm && <AddTradeForm onTradeAdded={handleTradeAdded} />}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell padding="checkbox">
+                <Checkbox
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      setSelectedTrades(trades.map(t => t._id));
+                    } else {
+                      setSelectedTrades([]);
+                    }
+                  }}
+                  checked={selectedTrades.length === trades.length && trades.length > 0}
+                  indeterminate={selectedTrades.length > 0 && selectedTrades.length < trades.length}
+                />
+              </TableCell>
               <TableCell>Trade Nr.</TableCell>
               <TableCell>Datum</TableCell>
               <TableCell>Symbol</TableCell>
@@ -78,25 +124,30 @@ const TradeList = () => {
             {trades.map((trade) => (
               <TableRow 
                 key={trade._id} 
-                onClick={() => handleRowClick(trade)}
-                style={{ cursor: 'pointer' }}
                 hover
               >
-                <TableCell>{trade.tradeNumber || ''}</TableCell>
-                <TableCell>{trade.date ? new Date(trade.date).toLocaleDateString() : ''}</TableCell>
-                <TableCell>{trade.symbol || ''}</TableCell>
-                <TableCell>{trade.model || ''}</TableCell>
-                <TableCell>{trade.bias || ''}</TableCell>
-                <TableCell>{trade.session || ''}</TableCell>
-                <TableCell>{trade.timeframe || ''}</TableCell>
-                <TableCell>{trade.confluences ? trade.confluences.join(', ') : ''}</TableCell>
-                <TableCell>{trade.orderType || ''}</TableCell>
-                <TableCell>{trade.position || ''}</TableCell>
-                <TableCell>{trade.status || ''}</TableCell>
-                <TableCell>{trade.slPips !== undefined ? trade.slPips : ''}</TableCell>
-                <TableCell>{trade.riskPercentage !== undefined ? `${trade.riskPercentage}%` : ''}</TableCell>
-                <TableCell>{trade.netPnL !== undefined ? trade.netPnL : ''}</TableCell>
-                <TableCell>{trade.maxRR !== undefined ? trade.maxRR : ''}</TableCell>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectedTrades.includes(trade._id)}
+                    onChange={(event) => handleCheckboxChange(event, trade._id)}
+                    onClick={(event) => event.stopPropagation()}
+                  />
+                </TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.tradeNumber || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.date ? new Date(trade.date).toLocaleDateString() : ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.symbol || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.model || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.bias || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.session || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.timeframe || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.confluences ? trade.confluences.join(', ') : ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.orderType || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.position || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.status || ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.slPips !== undefined ? trade.slPips : ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.riskPercentage !== undefined ? `${trade.riskPercentage}%` : ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.netPnL !== undefined ? trade.netPnL : ''}</TableCell>
+                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.maxRR !== undefined ? trade.maxRR : ''}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Button, Grid, Typography } from '@mui/material';
-import AddTradeForm from './AddTradeForm';
+import React from 'react';
+import { Grid, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
 
-  const toggleForm = () => {
-    setShowForm(!showForm);
+  const handleGoToTradeList = () => {
+    navigate('/trades'); // Navigiert zur TradeList-Seite
   };
 
   return (
@@ -15,15 +15,10 @@ const Dashboard = () => {
         <Typography variant="h4">Willkommen im Trading Journal</Typography>
       </Grid>
       <Grid item xs={12}>
-        <Button variant="contained" color="primary" onClick={toggleForm}>
-          {showForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
+        <Button variant="contained" color="primary" onClick={handleGoToTradeList}>
+          Zu den Trades
         </Button>
       </Grid>
-      {showForm && (
-        <Grid item xs={12}>
-          <AddTradeForm />
-        </Grid>
-      )}
       {/* Hier können weitere Dashboard-Elemente hinzugefügt werden */}
     </Grid>
   );
