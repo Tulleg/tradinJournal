@@ -1,5 +1,6 @@
+// TradeList.js
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Checkbox, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddTradeForm from './AddTradeForm';
 import EditTradeForm from './EditTradeForm';
@@ -83,15 +84,9 @@ const TradeList = () => {
       <Typography variant="h4" gutterBottom>
         Trade Liste
       </Typography>
-      <Button 
-  variant="contained" 
-  color="primary" 
-  onClick={toggleAddForm} 
-  style={{ marginBottom: '20px', marginRight: '10px' }}
->
-  Neuen Trade hinzufügen
-</Button>
-
+      <Button variant="contained" color="primary" onClick={toggleAddForm} style={{ marginBottom: '20px', marginRight: '10px' }}>
+        {showAddForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
+      </Button>
       {selectedTrades.length > 0 && (
         <Button
           variant="contained"
@@ -103,7 +98,7 @@ const TradeList = () => {
           Ausgewählte löschen ({selectedTrades.length})
         </Button>
       )}
-      {showAddForm && <AddTradeForm onTradeAdded={handleTradeAdded} />}
+      
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -204,14 +199,12 @@ const TradeList = () => {
     </Button>
   </DialogActions>
 </Dialog>
-<Dialog open={addFormOpen} onClose={toggleAddForm} maxWidth="md" fullWidth>
-  <DialogTitle>Neuen Trade hinzufügen</DialogTitle>
-  <DialogContent>
-    <AddTradeForm onTradeAdded={handleTradeAdded} />
-  </DialogContent>
-</Dialog>
-<Dialog open={addFormOpen} onClose={toggleAddForm} maxWidth="md" fullWidth>
-  <DialogTitle>Neuen Trade hinzufügen</DialogTitle>
+<Dialog
+  open={addFormOpen}
+  onClose={toggleAddForm}
+  aria-labelledby="add-trade-dialog-title"
+>
+  <DialogTitle id="add-trade-dialog-title">Neuen Trade hinzufügen</DialogTitle>
   <DialogContent>
     <AddTradeForm onTradeAdded={handleTradeAdded} />
   </DialogContent>
@@ -221,9 +214,6 @@ const TradeList = () => {
     </Button>
   </DialogActions>
 </Dialog>
-
-
-
     </div>
   );
 };
