@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container } from '@material-ui/core';
+import { TextField, Button, Typography, Container } from '@mui/material';
 import { register } from '../services/api';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ const Register = () => {
     try {
       await register({ email, password });
       alert("Registrierung erfolgreich! Bitte loggen Sie sich ein.");
-      history.push('/login');
+      navigate('/login');
     } catch (error) {
       console.error('Registrierung fehlgeschlagen:', error);
       alert("Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.");

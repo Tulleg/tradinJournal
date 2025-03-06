@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container } from '@material-ui/core';
+import { TextField, Button, Typography, Container } from '@mui/material';
 import { resetPasswordRequest } from '../services/api';
+
+
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
