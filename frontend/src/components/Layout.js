@@ -1,19 +1,26 @@
 // Layout.js
 import React from 'react';
-import { Box, Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, AppBar } from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemButton,Button, ListItemIcon, ListItemText, Toolbar, Typography, AppBar, IconButton } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
-import AddIcon from '@mui/icons-material/Add'; // Icon für "Add Trade" Button
-import DashboardIcon from '@mui/icons-material/Dashboard'; // Icon für Dashboard
-import ListAltIcon from '@mui/icons-material/ListAlt'; // Icon für Trade Log
-/*import AssessmentIcon from '@mui/icons-material/Assessment'; // Icon für Reports
-import InsightsIcon from '@mui/icons-material/Insights'; // Icon für Insights
-import SchoolIcon from '@mui/icons-material/School'; // Icon für University
-import BookIcon from '@mui/icons-material/Book'; // Icon für Notebook*/
-
+import AddIcon from '@mui/icons-material/Add';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import InsightsIcon from '@mui/icons-material/Insights';
+import SchoolIcon from '@mui/icons-material/School';
+import BookIcon from '@mui/icons-material/Book';
+import LogoutIcon from '@mui/icons-material/Logout'; // Importiere das Logout-Icon
+import { useAuth } from '../context/AuthContext'; // Importiere useAuth
 const drawerWidth = 240;
 
 const Layout = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { logout } = useAuth(); // Hole die logout-Funktion aus dem AuthContext
+
+  const handleLogout = () => {
+      logout();
+      navigate('/login'); // Navigiere zur Login-Seite nach dem Ausloggen
+  };
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -21,16 +28,34 @@ const Layout = () => {
             <AppBar
                 position="fixed"
                 sx={{
-                    width: `calc(100% - ${drawerWidth}px)`,
-                    ml: `${drawerWidth}px`,
-                    backgroundColor: '#2c3e50' // Dunkelblaue Farbe
+                  width: `calc(100% - ${drawerWidth}px)`,
+                  ml: `${drawerWidth}px`,
+                  backgroundColor: '#2c3e50',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start', // Startausrichtung
+                  alignItems: 'center',
+                  paddingRight: 2,
                 }}
             >
-                <Toolbar>
-                    <Typography variant="h6" noWrap component="div">
+                <Toolbar sx={{
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between', // Verteilt den Platz zwischen den Elementen
+    alignItems: 'center',
+}}>
+                    <Typography variant="h6" noWrap component="div" >
                         Trading Journal
                     </Typography>
                 </Toolbar>
+                <Button
+                    color="inherit"
+                    startIcon={<LogoutIcon />}
+                    onClick={handleLogout}
+                    sx={{ ml: 'auto' }} // Schiebt den Button nach rechts
+                >
+                    Logout
+                </Button>
             </AppBar>
 
             {/* Sidebar */}
@@ -41,8 +66,8 @@ const Layout = () => {
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                        backgroundColor: '#34495e', // Dunkelgraue Farbe
-                        color: 'white' // Schriftfarbe
+                        backgroundColor: '#34495e',
+                        color: 'white'
                     },
                 }}
                 variant="permanent"
@@ -50,7 +75,6 @@ const Layout = () => {
             >
                 <Toolbar />
                 <List>
-                    {/* Button zum Hinzufügen eines Trades */}
                     <ListItem key="AddTrade">
                         <Button
                             variant="contained"
@@ -59,9 +83,9 @@ const Layout = () => {
                             onClick={() => navigate('/addtrade')}
                             startIcon={<AddIcon />}
                             sx={{
-                                backgroundColor: '#e74c3c', // Rot
+                                backgroundColor: '#e74c3c',
                                 '&:hover': {
-                                    backgroundColor: '#c0392b', // Dunkleres Rot beim Hover
+                                    backgroundColor: '#c0392b',
                                 },
                                 color: 'white'
                             }}
@@ -69,7 +93,6 @@ const Layout = () => {
                             Add Trade
                         </Button>
                     </ListItem>
-                    {/* Navigationslinks */}
                     <ListItem key="Dashboard" disablePadding>
                         <ListItemButton onClick={() => navigate('/dashboard')}>
                             <ListItemIcon sx={{ color: 'white' }}>
@@ -95,10 +118,13 @@ const Layout = () => {
                 sx={{
                     flexGrow: 1,
                     p: 3,
-                    ml: `${drawerWidth}px`,
-                    mt: '64px', // Höhe der AppBar
-                    backgroundColor: '#ecf0f1', // Hellgrau für den Hintergrund
-                    minHeight: '100vh', // Mindesthöhe, um den gesamten Viewport abzudecken
+                    ml: '200px',
+                    mt: '64px',
+                    backgroundColor: '#fffff', // Hier wird die Hintergrundfarbe auf Weiß gesetzt
+                    minHeight: '100vh',
+                    height: '100%',
+                    alignItems: 'center',
+                    
                 }}
             >
                 <Outlet />
