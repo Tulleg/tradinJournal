@@ -71,7 +71,7 @@ const TradeList = () => {
     };
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', maxWidth: 1400, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h4" gutterBottom>
                 Trade Liste
             </Typography>
