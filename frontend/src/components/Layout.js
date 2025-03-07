@@ -1,14 +1,10 @@
 // Layout.js
 import React from 'react';
-import { Box, Drawer, List, ListItem, ListItemButton,Button, ListItemIcon, ListItemText, Toolbar, Typography, AppBar, IconButton } from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemButton,Button, ListItemIcon, ListItemText, Toolbar, Typography, AppBar} from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import InsightsIcon from '@mui/icons-material/Insights';
-import SchoolIcon from '@mui/icons-material/School';
-import BookIcon from '@mui/icons-material/Book';
 import LogoutIcon from '@mui/icons-material/Logout'; // Importiere das Logout-Icon
 import { useAuth } from '../context/AuthContext'; // Importiere useAuth
 const drawerWidth = 240;

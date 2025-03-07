@@ -1,8 +1,7 @@
 // TradeList.js
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent, DialogTitle, Checkbox, Box } from '@mui/material';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent, Checkbox, Box } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddTradeForm from './AddTradeForm';
 import EditTradeForm from './EditTradeForm';
 import { getTrades, deleteTrade } from '../services/api';
 import { useNavigate, useOutletContext } from 'react-router-dom';
@@ -21,7 +20,7 @@ const TradeList = () => {
 
     useEffect(() => {
         fetchTrades();
-    }, []);
+    },);
 
     const fetchTrades = async () => {
         try {
@@ -49,10 +48,7 @@ const TradeList = () => {
         fetchTrades();
         setEditingTrade(null);
     };
-    const handleTradeAdded = () => {
-        fetchTrades();
-        setShowAddForm(false);
-    };
+    
 
     const handleCheckboxChange = (event, tradeId) => {
         if (event.target.checked) {
