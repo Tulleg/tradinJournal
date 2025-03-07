@@ -5,6 +5,7 @@ import { getTrades } from '../services/api';
 import 'chartjs-adapter-luxon';
 import { DateTime } from 'luxon';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import { DailyChart, MonthlyChart } from './ChartComponents'; // Importiere die Chart-Komponenten
 
 Chart.register(...registerables);
 
@@ -12,14 +13,10 @@ const Dashboard = () => {
     const [trades, setTrades] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const dailyChartRef = useRef(null);
-    const monthlyChartRef = useRef(null);
-    const dailyDialogChartRef = useRef(null);
-    const monthlyDialogChartRef = useRef(null);
+    // Entferne die Chart-Ref Hooks
     const [startDate, setStartDate] = useState(DateTime.now().minus({ months: 1 }).toFormat('yyyy-MM-dd'));
     const [endDate, setEndDate] = useState(DateTime.now().toFormat('yyyy-MM-dd'));
-    const dailyChartInstance = useRef(null);
-    const monthlyChartInstance = useRef(null);
+    // Entferne die Chart-Instanz Hooks
     const [openDialog, setOpenDialog] = useState(null);
 
     useEffect(() => {
@@ -39,22 +36,6 @@ const Dashboard = () => {
         fetchTradesData();
     }, []);
 
-    useEffect(() => {
-        if (trades.length > 0) {
-            createDailyChart();
-            createMonthlyChart();
-        }
-
-        return () => {
-            if (dailyChartInstance.current) {
-                dailyChartInstance.current.destroy();
-            }
-            if (monthlyChartInstance.current) {
-                monthlyChartInstance.current.destroy();
-            }
-        };
-    }, [trades, startDate, endDate]);
-
     const filteredTrades = trades.filter(trade => {
         const tradeDate = DateTime.fromISO(trade.date);
         const start = DateTime.fromISO(startDate);
@@ -62,118 +43,12 @@ const Dashboard = () => {
         return tradeDate >= start && tradeDate <= end;
     });
 
-    const createDailyChart = useCallback(() => {
-        const dailyChartData = filteredTrades
-            .map((trade) => ({
-                date: DateTime.fromISO(trade.date),
-                netPnL: trade.netPnL || 0,
-            }))
-            .reduce((acc, curr) => {
-                const dateString = curr.date.toFormat('yyyy-MM-dd');
-                const existingEntry = acc.find((item) => item.date.toFormat('yyyy-MM-dd') === dateString);
-                if (existingEntry) {
-                    existingEntry.netPnL += curr.netPnL;
-                } else {
-                    acc.push({ date: curr.date, netPnL: curr.netPnL });
-                }
-                return acc;
-            }, [])
-            .sort((a, b) => a.date - b.date);
-
-        const ctx = dailyChartRef.current?.getContext('2d');
-        if (!ctx) return;
-
-        if (dailyChartInstance.current) {
-            dailyChartInstance.current.destroy();
-        }
-
-        dailyChartInstance.current = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dailyChartData.map(data => data.date.toFormat('yyyy-MM-dd')),
-                datasets: [{
-                    label: 'Daily Net P&L',
-                    data: dailyChartData.map(data => data.netPnL),
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day',
-                            displayFormats: {
-                                day: 'yyyy-MM-dd'
-                            }
-                        },
-                        ticks: {
-                            source: 'data'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }, [filteredTrades]);
-
-    const createMonthlyChart = useCallback(() => {
-        const monthlyChartData = filteredTrades
-            .map((trade) => ({
-                date: DateTime.fromISO(trade.date),
-                netPnL: trade.netPnL || 0,
-            }))
-            .reduce((acc, curr) => {
-                const monthYear = curr.date.toFormat('yyyy-MM');
-                const existingEntry = acc.find((item) => item.monthYear === monthYear);
-                if (existingEntry) {
-                    existingEntry.netPnL += curr.netPnL;
-                } else {
-                    acc.push({ monthYear, netPnL: curr.netPnL });
-                }
-                return acc;
-            }, [])
-            .sort((a, b) => a.monthYear.localeCompare(b.monthYear));
-
-        const ctx = monthlyChartRef.current?.getContext('2d');
-        if (!ctx) return;
-
-        if (monthlyChartInstance.current) {
-            monthlyChartInstance.current.destroy();
-        }
-
-        monthlyChartInstance.current = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: monthlyChartData.map(data => data.monthYear),
-                datasets: [{
-                    label: 'Monthly Net P&L',
-                    data: monthlyChartData.map(data => data.netPnL),
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }, [filteredTrades]);
-
-    const createDialogChart = useCallback((chartType) => {
-        const chartData = chartType === 'daily' ? filteredTrades.map(trade => ({
+    const dailyChartData = filteredTrades
+        .map((trade) => ({
             date: DateTime.fromISO(trade.date),
             netPnL: trade.netPnL || 0,
-        })).reduce((acc, curr) => {
+        }))
+        .reduce((acc, curr) => {
             const dateString = curr.date.toFormat('yyyy-MM-dd');
             const existingEntry = acc.find((item) => item.date.toFormat('yyyy-MM-dd') === dateString);
             if (existingEntry) {
@@ -182,10 +57,15 @@ const Dashboard = () => {
                 acc.push({ date: curr.date, netPnL: curr.netPnL });
             }
             return acc;
-        }, []).sort((a, b) => a.date - b.date) : filteredTrades.map(trade => ({
+        }, [])
+        .sort((a, b) => a.date - b.date);
+
+    const monthlyChartData = filteredTrades
+        .map((trade) => ({
             date: DateTime.fromISO(trade.date),
             netPnL: trade.netPnL || 0,
-        })).reduce((acc, curr) => {
+        }))
+        .reduce((acc, curr) => {
             const monthYear = curr.date.toFormat('yyyy-MM');
             const existingEntry = acc.find((item) => item.monthYear === monthYear);
             if (existingEntry) {
@@ -194,49 +74,8 @@ const Dashboard = () => {
                 acc.push({ monthYear, netPnL: curr.netPnL });
             }
             return acc;
-        }, []).sort((a, b) => a.monthYear.localeCompare(b.monthYear));
-
-        const canvasRef = chartType === 'daily' ? dailyDialogChartRef : monthlyDialogChartRef;
-        const chartTypeForChart = chartType === 'daily' ? 'line' : 'bar';
-
-        const dialogCtx = canvasRef.current?.getContext('2d');
-        if (!dialogCtx) return;
-
-        new Chart(dialogCtx, {
-            type: chartTypeForChart,
-            data: {
-                labels: chartData.map(data => chartType === 'daily' ? data.date.toFormat('yyyy-MM-dd') : data.monthYear),
-                datasets: [{
-                    label: chartType === 'daily' ? 'Daily Net P&L' : 'Monthly Net P&L',
-                    data: chartData.map(data => data.netPnL),
-                    borderColor: chartType === 'daily' ? 'rgb(75, 192, 192)' : undefined,
-                    backgroundColor: chartType === 'monthly' ? 'rgba(75, 192, 192, 0.6)' : undefined,
-                    tension: chartType === 'daily' ? 0.1 : undefined,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day',
-                            displayFormats: {
-                                day: 'yyyy-MM-dd'
-                            }
-                        },
-                        ticks: {
-                            source: 'data'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-            }
-        });
-    }, [filteredTrades]);
+        }, [])
+        .sort((a, b) => a.monthYear.localeCompare(b.monthYear));
 
     // Berechne die gesamte Net P&L und die Anzahl der Trades
     const totalNetPnL = filteredTrades.reduce((acc, trade) => acc + (trade.netPnL || 0), 0);
@@ -257,10 +96,6 @@ const Dashboard = () => {
 
     const handleOpenDialog = (chartType) => {
         setOpenDialog(chartType);
-        // Erstelle das Chart erst, wenn der Dialog geöffnet wird
-        setTimeout(() => {
-            createDialogChart(chartType);
-        }, 0);
     };
 
     const handleCloseDialog = () => {
@@ -337,7 +172,8 @@ const Dashboard = () => {
                                 <Typography color="error">{error}</Typography>
                             ) : (
                                 <Box sx={{ position: 'relative' }}>
-                                    <canvas ref={dailyChartRef} height="300" />
+                                    {/* Verwende die DailyChart-Komponente */}
+                                    <DailyChart chartData={dailyChartData} />
                                     <IconButton
                                         aria-label="vergrößern"
                                         sx={{ position: 'absolute', top: 0, right: 0 }}
@@ -364,7 +200,8 @@ const Dashboard = () => {
                                 <Typography color="error">{error}</Typography>
                             ) : (
                                 <Box sx={{ position: 'relative' }}>
-                                    <canvas ref={monthlyChartRef} height="300" />
+                                    {/* Verwende die MonthlyChart-Komponente */}
+                                    <MonthlyChart chartData={monthlyChartData} />
                                     <IconButton
                                         aria-label="vergrößern"
                                         sx={{ position: 'absolute', top: 0, right: 0 }}
@@ -384,10 +221,10 @@ const Dashboard = () => {
                 <DialogTitle>{openDialog === 'daily' ? 'Tägliche Net Cumulative P&L' : 'Monatliche Net P&L'}</DialogTitle>
                 <DialogContent>
                     {openDialog === 'daily' && (
-                        <canvas ref={dailyDialogChartRef} style={{ height: '500px', width: '100%' }} />
+                        <DailyChart chartData={dailyChartData} />
                     )}
                     {openDialog === 'monthly' && (
-                        <canvas ref={monthlyDialogChartRef} style={{ height: '500px', width: '100%' }} />
+                        <MonthlyChart chartData={monthlyChartData} />
                     )}
                 </DialogContent>
             </Dialog>
