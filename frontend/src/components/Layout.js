@@ -118,16 +118,19 @@ const Layout = () => {
                 sx={{
                     flexGrow: 1,
                     p: 3,
-                    ml: '200px',
-                    mt: '64px',
-                    backgroundColor: '#fffff', // Hier wird die Hintergrundfarbe auf Weiß gesetzt
+                    //ml: `${drawerWidth}px`,
+                    mt: '64px', // Höhe der AppBar
+                    backgroundColor: '#f0f0f0',
                     minHeight: '100vh',
-                    height: '100%',
-                    alignItems: 'center',
+                    display: 'flex', // Aktiviert Flexbox
+                    justifyContent: 'center', // Zentriert horizontal
+                    alignItems: 'flex-start', // Zentriert vertikal (falls nötig)
                     
                 }}
             >
+            <Box sx={{ width: '100%', maxWidth: 1400 }}> {/* Begrenzte Breite für den Inhalt */}
                 <Outlet />
+                </Box>
             </Box>
         </Box>
     );

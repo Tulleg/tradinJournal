@@ -1,16 +1,23 @@
 // TradeList.js
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent, DialogTitle, Checkbox, Box } from '@mui/material'; // Box hinzugefügt
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Dialog, DialogContent, DialogTitle, Checkbox, Box } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddTradeForm from './AddTradeForm';
 import EditTradeForm from './EditTradeForm';
 import { getTrades, deleteTrade } from '../services/api';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 const TradeList = () => {
-    const [trades, setTrades] = useState([]);
+    const [tradesLocal, setTradesLocal] = useState([]); // Lokaler State für Trades
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingTrade, setEditingTrade] = useState(null);
     const [selectedTrades, setSelectedTrades] = useState([]);
+    const navigate = useNavigate();
+
+    // Versuche den Kontext zu verwenden (falls vorhanden)
+    const context = useOutletContext() || {};
+    const trades = context.trades || tradesLocal;
+    const setTrades = context.setTrades || setTradesLocal;
 
     useEffect(() => {
         fetchTrades();
@@ -19,7 +26,7 @@ const TradeList = () => {
     const fetchTrades = async () => {
         try {
             const response = await getTrades();
-            setTrades(response.data);
+            setTrades(response.data); // Aktualisiere entweder den Kontext oder den lokalen State
         } catch (error) {
             console.error('Fehler beim Abrufen der Trades:', error);
         }
@@ -29,8 +36,9 @@ const TradeList = () => {
         setShowAddForm(!showAddForm);
     };
 
-    const handleRowClick = (trade) => {
-        setEditingTrade(trade);
+   const handleRowClick = (trade) => {
+    console.log('Clicked trade:', trade); // Überprüfen, ob der Trade vorhanden ist
+    setEditingTrade(trade);
     };
 
     const handleCloseEditDialog = () => {
@@ -41,7 +49,6 @@ const TradeList = () => {
         fetchTrades();
         setEditingTrade(null);
     };
-
     const handleTradeAdded = () => {
         fetchTrades();
         setShowAddForm(false);
@@ -68,24 +75,30 @@ const TradeList = () => {
     };
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 1200 }}> {/* Container für die TradeList mit maximaler Breite */}
+        <Box sx={{ width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h4" gutterBottom>
                 Trade Liste
             </Typography>
-            <Button variant="contained" color="primary" onClick={toggleAddForm} style={{ marginBottom: '20px', marginRight: '10px' }}>
-                {showAddForm ? 'Formular schließen' : 'Neuen Trade hinzufügen'}
-            </Button>
+            <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={() => navigate('/addtrade')}
+                      >
+                        + Add Trade
+                      </Button>
             {selectedTrades.length > 0 && (
                 <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<DeleteIcon />}
-                    onClick={handleDeleteSelected}
-                    style={{ marginBottom: '20px' }}
-                >
-                    Ausgewählte löschen ({selectedTrades.length})
+                variant="contained"
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={handleDeleteSelected}
+                style={{ marginBottom: '20px' }}
+            >
+                Ausgewählte löschen ({selectedTrades.length})
                 </Button>
             )}
+            {/* Tabelle */}
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -121,10 +134,12 @@ const TradeList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {trades.map((trade) => (
+                        {trades.map((trade, index) => (
                             <TableRow
                                 key={trade._id}
                                 hover
+                                onClick={() => handleRowClick(trade)}
+                                style={{ cursor: 'pointer' }}
                             >
                                 <TableCell padding="checkbox">
                                     <Checkbox
@@ -133,26 +148,33 @@ const TradeList = () => {
                                         onClick={(event) => event.stopPropagation()}
                                     />
                                 </TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.tradeNumber || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.date ? new Date(trade.date).toLocaleDateString() : ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.symbol || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.model || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.bias || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.session || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.timeframe || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.confluences ? trade.confluences.join(', ') : ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.orderType || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.position || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.status || ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.slPips !== undefined ? trade.slPips : ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.riskPercentage !== undefined ? `${trade.riskPercentage}%` : ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.netPnL !== undefined ? trade.netPnL : ''}</TableCell>
-                                <TableCell onClick={() => handleRowClick(trade)} style={{ cursor: 'pointer' }}>{trade.maxRR !== undefined ? trade.maxRR : ''}</TableCell>
+                                <TableCell>{trade.tradeNumber || ''}</TableCell>
+                                <TableCell>{trade.date ? new Date(trade.date).toLocaleDateString() : ''}</TableCell>
+                                <TableCell>{trade.symbol || ''}</TableCell>
+                                <TableCell>{trade.model || ''}</TableCell>
+                                <TableCell>{trade.bias || ''}</TableCell>
+                                <TableCell>{trade.session || ''}</TableCell>
+                                <TableCell>{trade.timeframe || ''}</TableCell>
+                                <TableCell>{trade.confluences ? trade.confluences.join(', ') : ''}</TableCell>
+                                <TableCell>{trade.orderType || ''}</TableCell>
+                                <TableCell>{trade.position || ''}</TableCell>
+                                <TableCell>{trade.status || ''}</TableCell>
+                                <TableCell>{trade.slPips !== undefined ? trade.slPips : ''}</TableCell>
+                                <TableCell>{trade.riskPercentage !== undefined ? `${trade.riskPercentage}%` : ''}</TableCell>
+                                <TableCell>{trade.netPnL !== undefined ? trade.netPnL : ''}</TableCell>
+                                <TableCell>{trade.maxRR !== undefined ? trade.maxRR : ''}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {/* Dialoge */}
+            {showAddForm && (
+                <Dialog open={showAddForm} onClose={toggleAddForm}>
+                    {/* Add Form */}
+                </Dialog>
+            )}
             <Dialog open={editingTrade !== null} onClose={handleCloseEditDialog} maxWidth="md" fullWidth>
                 <DialogContent>
                     {editingTrade && (
