@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Box, Grid, Card, CardContent, Typography, TextField, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { Chart, registerables } from 'chart.js';
 import { getTrades } from '../services/api';
